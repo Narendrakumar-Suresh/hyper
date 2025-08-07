@@ -1,0 +1,31 @@
+# Ignore all .env* files everywhere except example files
+**/.env*
+!**/.env.example
+!**/.env.*.example
+
+# Ignore Python cache and test cache
+tests/__pycache__/
+sensai-ai/__pycache__/
+sensai-ai/.pytest_cache/
+
+# Ignore node modules
+sensai-frontend/node_modules/
+
+# Ignore VSCode settings
+.vscode/
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore other common files
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore coverage and test output
+htmlcov/
+.coverage
+coverage.xml
+
+# Ignore local development files
+*.local
