@@ -21,7 +21,7 @@ router = APIRouter()
 
 
 @router.get("/{user_id}")
-async def get_user_by_id(user_id: int) -> Dict:
+async def get_user_by_id(user_id: str) -> Dict:
     user = await get_user_by_id_from_db(user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -30,7 +30,7 @@ async def get_user_by_id(user_id: int) -> Dict:
 
 @router.put("/{user_id}")
 async def update_user(
-    user_id: int,
+    user_id: str,
     first_name: str,
     middle_name: str,
     last_name: str,
@@ -50,22 +50,22 @@ async def update_user(
 
 
 @router.get("/{user_id}/cohorts")
-async def get_user_cohorts(user_id: int) -> List[Dict]:
+async def get_user_cohorts(user_id: str) -> List[Dict]:
     return await get_user_cohorts_from_db(user_id)
 
 
 @router.get("/{user_id}/activity/{year}")
-async def get_user_activity_for_year(user_id: int, year: int) -> List[int]:
+async def get_user_activity_for_year(user_id: str, year: int) -> List[int]:
     return await get_user_activity_for_year_from_db(user_id, year)
 
 
 @router.get("/{user_id}/active_days")
-async def get_user_active_days(user_id: int, days: int, cohort_id: int) -> List[str]:
+async def get_user_active_days(user_id: str, days: int, cohort_id: int) -> List[str]:
     return await get_user_active_in_last_n_days_from_db(user_id, days, cohort_id)
 
 
 @router.get("/{user_id}/streak")
-async def get_user_streak(user_id: int, cohort_id: int) -> GetUserStreakResponse:
+async def get_user_streak(user_id: str, cohort_id: int) -> GetUserStreakResponse:
     streak_days = await get_user_streak_from_db(user_id, cohort_id)
 
     streak_count = len(streak_days)
@@ -81,20 +81,20 @@ async def get_user_streak(user_id: int, cohort_id: int) -> GetUserStreakResponse
 
 
 @router.get("/{user_id}/cohort/{cohort_id}/present")
-async def is_user_present_in_cohort(user_id: int, cohort_id: int) -> bool:
+async def is_user_present_in_cohort(user_id: str, cohort_id: int) -> bool:
     return await is_user_in_cohort_from_db(user_id, cohort_id)
 
 
 @router.get("/{user_id}/courses", response_model=List[UserCourse])
-async def get_user_courses(user_id: int) -> List[UserCourse]:
+async def get_user_courses(user_id: str) -> List[UserCourse]:
     return await get_user_courses_from_db(user_id)
 
 
 @router.get("/{user_id}/org/{org_id}/cohorts", response_model=List[UserCohort])
-async def get_user_org_cohorts(user_id: int, org_id: int) -> List[UserCohort]:
+async def get_user_org_cohorts(user_id: str, org_id: int) -> List[UserCohort]:
     return await get_user_org_cohorts_from_db(user_id, org_id)
 
 
 @router.get("/{user_id}/orgs")
-async def get_user_orgs(user_id: int) -> List[Dict]:
+async def get_user_orgs(user_id: str) -> List[Dict]:
     return await get_user_organizations(user_id)

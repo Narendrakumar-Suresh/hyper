@@ -24,11 +24,11 @@ async def save_code_draft(request: SaveCodeDraftRequest):
 @router.get(
     "/user/{user_id}/question/{question_id}", response_model=Optional[CodeDraft]
 )
-async def get_code_draft(user_id: int, question_id: int):
+async def get_code_draft(user_id: str, question_id: int):
     return await get_code_draft_from_db(user_id, question_id)
 
 
 @router.delete("/user/{user_id}/question/{question_id}")
-async def delete_code_draft(user_id: int, question_id: int):
+async def delete_code_draft(user_id: str, question_id: int):
     await delete_code_draft_in_db(user_id, question_id)
     return {"success": True}

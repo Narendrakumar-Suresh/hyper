@@ -59,7 +59,7 @@ async def delete_milestone(milestone_id: int):
     )
 
 
-async def get_user_metrics_for_all_milestones(user_id: int, course_id: int):
+async def get_user_metrics_for_all_milestones(user_id: str, course_id: int):
     # Get milestones with tasks
     base_results = await execute_db_operation(
         f"""

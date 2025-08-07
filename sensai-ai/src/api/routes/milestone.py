@@ -31,7 +31,7 @@ async def delete_milestone(milestone_id: int):
 
 @router.get("/metrics/user/{user_id}/course/{course_id}")
 async def get_user_metrics_for_all_milestones(
-    user_id: int, course_id: int
+    user_id: str, course_id: int
 ) -> List[Dict]:
     return await get_user_metrics_for_all_milestones_from_db(user_id, course_id)
 

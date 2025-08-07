@@ -27,7 +27,7 @@ async def update_user_email(email_1: str, email_2: str) -> None:
     )
 
 
-async def get_user_organizations(user_id: int):
+async def get_user_organizations(user_id: str):
     user_organizations = await execute_db_operation(
         f"""SELECT uo.org_id, o.name, uo.role, o.openai_api_key, o.openai_free_trial
         FROM {user_organizations_table_name} uo
@@ -49,7 +49,7 @@ async def get_user_organizations(user_id: int):
     ]
 
 
-async def get_user_org_cohorts(user_id: int, org_id: int) -> List[UserCohort]:
+async def get_user_org_cohorts(user_id: str, org_id: int) -> List[UserCohort]:
     """
     Get all the cohorts in the organization that the user is a member in
     """
@@ -99,6 +99,7 @@ def convert_user_db_to_dict(user: Tuple) -> Dict:
 async def insert_or_return_user(
     cursor,
     email: str,
+    user_id: str,  # ← Add this: the Google 'sub'
     given_name: str = None,
     family_name: str = None,
 ):
@@ -106,38 +107,41 @@ async def insert_or_return_user(
     Inserts a new user or returns an existing user.
 
     Args:
+        cursor: An existing database cursor
         email: The user's email address.
+        user_id: The unique ID from OAuth provider (e.g., Google 'sub')
         given_name: The user's given name (first and middle names).
         family_name: The user's family name (last name).
-        cursor: An existing database cursor
 
     Returns:
         A dictionary representing the user.
-
-    Raises:
-        Any exception raised by the database operations.
     """
 
     if given_name is None:
         first_name = None
         middle_name = None
     else:
-        given_name_parts = given_name.split(" ")
+        given_name_parts = given_name.split(" ", 1)  # Split only on first space
         first_name = given_name_parts[0]
-        middle_name = " ".join(given_name_parts[1:])
-        if not middle_name:
-            middle_name = None
+        middle_name = given_name_parts[1] if len(given_name_parts) > 1 else None
 
-    # if user exists, no need to do anything, just return the user
+    # Look up user by email OR by id
     await cursor.execute(
-        f"""SELECT * FROM {users_table_name} WHERE email = ?""",
-        (email,),
+        f"""SELECT * FROM {users_table_name} WHERE email = ? OR id = ?""",
+        (email, user_id),
     )
-
     user = await cursor.fetchone()
 
     if user:
         user = convert_user_db_to_dict(user)
+        # If user was found by email but has no ID, update it with Google ID
+        if user["id"] is None or user["id"] == "":
+            await cursor.execute(
+                f"UPDATE {users_table_name} SET id = ? WHERE email = ?",
+                (user_id, email),
+            )
+            user["id"] = user_id
+        # Update name if missing
         if user["first_name"] is None and first_name:
             user = await update_user(
                 cursor,
@@ -147,27 +151,27 @@ async def insert_or_return_user(
                 family_name,
                 user["default_dp_color"],
             )
-
         return user
 
-    # create a new user
+    # Create new user with explicit ID from Google
     color = generate_random_color()
     await cursor.execute(
         f"""
-        INSERT INTO {users_table_name} (email, default_dp_color, first_name, middle_name, last_name)
-        VALUES (?, ?, ?, ?, ?)
-    """,
-        (email, color, first_name, middle_name, family_name),
+        INSERT INTO {users_table_name} 
+        (id, email, default_dp_color, first_name, middle_name, last_name)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """,
+        (user_id, email, color, first_name, middle_name, family_name),
     )
 
+    # Retrieve the created user
     await cursor.execute(
-        f"""SELECT * FROM {users_table_name} WHERE email = ?""",
-        (email,),
+        f"""SELECT * FROM {users_table_name} WHERE id = ?""",
+        (user_id,),
     )
-
     user = convert_user_db_to_dict(await cursor.fetchone())
 
-    # Send Slack notification for new user
+    # Notify Slack
     await send_slack_notification_for_new_user(user)
 
     return user
@@ -215,7 +219,7 @@ async def get_user_by_id(user_id: str) -> Dict:
     return convert_user_db_to_dict(user)
 
 
-async def get_user_cohorts(user_id: int) -> List[Dict]:
+async def get_user_cohorts(user_id: str) -> List[Dict]:
     """Get all cohorts (and the groups in each cohort) that the user is a part of along with their role in each group"""
     results = await execute_db_operation(
         f"""
@@ -242,7 +246,7 @@ async def get_user_cohorts(user_id: int) -> List[Dict]:
     ]
 
 
-async def get_user_active_in_last_n_days(user_id: int, n: int, cohort_id: int):
+async def get_user_active_in_last_n_days(user_id: str, n: int, cohort_id: int):
     activity_per_day = await execute_db_operation(
         f"""
     WITH chat_activity AS (
@@ -299,7 +303,7 @@ async def get_user_active_in_last_n_days(user_id: int, n: int, cohort_id: int):
     return list(active_days)
 
 
-async def get_user_activity_for_year(user_id: int, year: int):
+async def get_user_activity_for_year(user_id: str, year: int):
     # Get all chat messages for the user in the given year, grouped by day
     activity_per_day = await execute_db_operation(
         f"""
@@ -359,7 +363,7 @@ def get_user_streak_from_usage_dates(user_usage_dates: List[str]) -> int:
     return current_streak
 
 
-async def get_user_streak(user_id: int, cohort_id: int):
+async def get_user_streak(user_id: str, cohort_id: int):
     user_usage_dates = await execute_db_operation(
         f"""
     SELECT MAX(datetime(created_at, '+5 hours', '+30 minutes')) as created_at

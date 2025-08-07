@@ -92,7 +92,7 @@ async def get_org_id_from_api_key(api_key: str) -> int:
     raise ValueError("Invalid API key")
 
 
-async def create_organization_with_user(org_name: str, slug: str, user_id: int):
+async def create_organization_with_user(org_name: str, slug: str, user_id: str):
     user = await get_user_by_id(user_id)
 
     if not user:
@@ -187,7 +187,7 @@ async def get_hva_cohort_ids() -> List[int]:
     return [cohort[0] for cohort in cohorts]
 
 
-async def is_user_hva_learner(user_id: int) -> bool:
+async def is_user_hva_learner(user_id: str) -> bool:
     hva_cohort_ids = await get_hva_cohort_ids()
 
     if not hva_cohort_ids:
@@ -333,7 +333,7 @@ async def clear_org_openai_api_key(org_id: int):
 
 async def add_user_to_org_by_user_id(
     cursor,
-    user_id: int,
+    user_id: str,
     org_id: int,
     role: Literal["owner", "admin"],
 ):

@@ -14,7 +14,7 @@ class UserLoginData(BaseModel):
 class CreateOrganizationRequest(BaseModel):
     name: str
     slug: str
-    user_id: int
+    user_id: str
 
 
 class CreateOrganizationResponse(BaseModel):
@@ -59,7 +59,7 @@ class CreateBulkTagsRequest(BaseModel):
 
 
 class CreateBadgeRequest(BaseModel):
-    user_id: int
+    user_id: str
     value: str
     badge_type: str
     image_path: str
@@ -448,7 +448,7 @@ class ChatResponseType(str, Enum):
 class ChatMessage(BaseModel):
     id: int
     created_at: str
-    user_id: int
+    user_id: str
     question_id: int
     role: ChatRole | None
     content: Optional[str] | None
@@ -571,7 +571,7 @@ class StoreMessageRequest(BaseModel):
 
 class StoreMessagesRequest(BaseModel):
     messages: List[StoreMessageRequest]
-    user_id: int
+    user_id: str
     question_id: int
     is_complete: bool
 
@@ -628,7 +628,7 @@ class TaskCourseResponse(BaseModel):
 
 
 class AddCVReviewUsageRequest(BaseModel):
-    user_id: int
+    user_id: str
     role: str
     ai_review: str
 
@@ -646,13 +646,13 @@ class AIChatRequest(BaseModel):
     question: Optional[DraftQuestion] = None
     chat_history: Optional[List[Dict]] = None
     question_id: Optional[int] = None
-    user_id: int
+    user_id: str
     task_id: int
     response_type: Optional[ChatResponseType] = None
 
 
 class MarkTaskCompletedRequest(BaseModel):
-    user_id: int
+    user_id: str
 
 
 class GetUserStreakResponse(BaseModel):
@@ -697,7 +697,7 @@ class LanguageCodeDraft(BaseModel):
 
 
 class SaveCodeDraftRequest(BaseModel):
-    user_id: int
+    user_id: str
     question_id: int
     code: List[LanguageCodeDraft]
 

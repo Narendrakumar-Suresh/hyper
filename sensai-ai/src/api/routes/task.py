@@ -136,7 +136,7 @@ async def delete_tasks(task_ids: List[int] = Query(...)):
 
 @router.get("/cohort/{cohort_id}/user/{user_id}/completed", response_model=List[int])
 async def get_tasks_completed_for_user(
-    user_id: int,
+    user_id: str,
     cohort_id: int,
     view: LeaderboardViewType = str(LeaderboardViewType.ALL_TIME),
 ) -> List[int]:

@@ -15,7 +15,7 @@ async def get_hva_openai_api_key():
 
 
 @router.get("/is_user_hva_learner")
-async def is_user_hva_learner(user_id: int):
+async def is_user_hva_learner(user_id: str):
     return await is_user_hva_learner_from_db(user_id)
 
 

@@ -883,7 +883,7 @@ async def update_milestone_orders(milestone_orders: List[Tuple[int, int]]):
     )
 
 
-async def get_user_courses(user_id: int) -> List[Dict]:
+async def get_user_courses(user_id: str) -> List[Dict]:
     """
     Get all courses for a user based on different roles:
     1. Courses where the user is a learner or mentor through cohorts

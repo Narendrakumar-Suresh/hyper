@@ -344,7 +344,7 @@ async def get_cohort_by_id(cohort_id: int):
     return cohort_data
 
 
-async def is_user_in_cohort(user_id: int, cohort_id: int):
+async def is_user_in_cohort(user_id: str, cohort_id: int):
     output = await execute_db_operation(
         f"""
         SELECT COUNT(*) > 0 FROM (
@@ -522,7 +522,7 @@ async def get_cohort_attempt_data_for_tasks(cohort_id: int, task_ids: List[int])
     return user_metrics
 
 
-def transfer_chat_history_to_user(prev_user_id: int, new_user_id: int):
+def transfer_chat_history_to_user(prev_user_id: str, new_user_id: str):
     execute_db_operation(
         f"UPDATE {chat_history_table_name} SET user_id = ? WHERE user_id = ?",
         (new_user_id, prev_user_id),

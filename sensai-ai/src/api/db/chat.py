@@ -14,7 +14,7 @@ from api.db.task import get_basic_task_details
 
 async def store_messages(
     messages: List[StoreMessageRequest],
-    user_id: int,
+    user_id: str,
     question_id: int,
     is_complete: bool,
 ):
@@ -122,7 +122,7 @@ def convert_chat_message_to_dict(message: Tuple) -> ChatMessage:
 
 
 async def get_question_chat_history_for_user(
-    question_id: int, user_id: int
+    question_id: int, user_id: str
 ) -> List[ChatMessage]:
     chat_history = await execute_db_operation(
         f"""
@@ -136,7 +136,7 @@ async def get_question_chat_history_for_user(
 
 
 async def get_task_chat_history_for_user(
-    task_id: int, user_id: int
+    task_id: int, user_id: str
 ) -> List[ChatMessage]:
     task = await get_basic_task_details(task_id)
 
@@ -177,7 +177,7 @@ async def update_message_timestamp(message_id: int, new_timestamp: datetime):
     )
 
 
-async def delete_user_chat_history_for_task(question_id: int, user_id: int):
+async def delete_user_chat_history_for_task(question_id: int, user_id: str):
     await execute_db_operation(
         f"DELETE FROM {chat_history_table_name} WHERE question_id = ? AND user_id = ?",
         (question_id, user_id),

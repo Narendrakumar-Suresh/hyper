@@ -5,7 +5,7 @@ from api.config import code_drafts_table_name
 from api.utils.db import execute_db_operation
 
 
-async def upsert_user_code_draft(user_id: int, question_id: int, code: List[Dict]):
+async def upsert_user_code_draft(user_id: str, question_id: int, code: List[Dict]):
     """Insert or update a code draft for a (user_id, question_id) pair."""
 
     await execute_db_operation(
@@ -20,7 +20,7 @@ async def upsert_user_code_draft(user_id: int, question_id: int, code: List[Dict
     )
 
 
-async def get_user_code_draft(user_id: int, question_id: int):
+async def get_user_code_draft(user_id: str, question_id: int):
     """Retrieve the latest code draft for the given user & question pair."""
 
     row = await execute_db_operation(
@@ -40,7 +40,7 @@ async def get_user_code_draft(user_id: int, question_id: int):
     }
 
 
-async def delete_user_code_draft(user_id: int, question_id: int):
+async def delete_user_code_draft(user_id: str, question_id: int):
     await execute_db_operation(
         f"DELETE FROM {code_drafts_table_name} WHERE user_id = ? AND question_id = ?",
         (user_id, question_id),

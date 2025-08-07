@@ -31,7 +31,7 @@ async def get_all_chat_history(org_id: int) -> List[ChatMessage]:
 
 @router.get("/user/{user_id}/task/{task_id}", response_model=List[ChatMessage])
 async def get_user_chat_history_for_task(
-    user_id: int, task_id: int
+    user_id: str, task_id: int
 ) -> List[ChatMessage]:
     return await get_task_chat_history_for_user_from_db(
         user_id=user_id, task_id=task_id

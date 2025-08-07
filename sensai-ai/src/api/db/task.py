@@ -612,7 +612,7 @@ async def delete_tasks(task_ids: List[int]):
 
 
 async def get_solved_tasks_for_user(
-    user_id: int,
+    user_id: str,
     cohort_id: int,
     view_type: LeaderboardViewType = LeaderboardViewType.ALL_TIME,
 ):
@@ -660,7 +660,7 @@ async def get_solved_tasks_for_user(
     return [task[0] for task in results]
 
 
-async def mark_task_completed(task_id: int, user_id: int):
+async def mark_task_completed(task_id: int, user_id: str):
     # Update task completion table using INSERT OR IGNORE to handle duplicates gracefully
     await execute_db_operation(
         f"""
@@ -672,7 +672,7 @@ async def mark_task_completed(task_id: int, user_id: int):
 
 
 async def delete_completion_history_for_task(
-    task_id: int, question_id: int, user_id: int
+    task_id: int, question_id: int, user_id: str
 ):
     if task_id is not None:
         await execute_db_operation(

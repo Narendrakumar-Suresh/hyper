@@ -140,7 +140,7 @@ async def get_courses_for_cohort(
     "/{cohort_id}/completion",
     response_model=Dict,
 )
-async def get_cohort_completion(cohort_id: int, user_id: int) -> Dict:
+async def get_cohort_completion(cohort_id: int, user_id: str) -> Dict:
     results = await get_cohort_completion_from_db(cohort_id, [user_id])
     return results[user_id]
 

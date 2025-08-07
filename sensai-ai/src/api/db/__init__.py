@@ -71,7 +71,7 @@ async def create_org_api_keys_table(cursor):
 async def create_users_table(cursor):
     await cursor.execute(
         f"""CREATE TABLE IF NOT EXISTS {users_table_name} (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id TEXT PRIMARY KEY,
                 email TEXT NOT NULL UNIQUE,
                 first_name TEXT,
                 middle_name TEXT,
@@ -86,7 +86,7 @@ async def create_user_organizations_table(cursor):
     await cursor.execute(
         f"""CREATE TABLE IF NOT EXISTS {user_organizations_table_name} (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER NOT NULL,
+                user_id TEXT NOT NULL,  -- Changed from INTEGER to TEXT
                 org_id INTEGER NOT NULL,
                 role TEXT NOT NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -95,7 +95,8 @@ async def create_user_organizations_table(cursor):
                 FOREIGN KEY (org_id) REFERENCES {organizations_table_name}(id) ON DELETE CASCADE
             )"""
     )
-
+    await cursor.execute(f"CREATE INDEX idx_user_org_user_id ON {user_organizations_table_name} (user_id)")
+    await cursor.execute(f"CREATE INDEX idx_user_org_org_id ON {user_organizations_table_name} (org_id)")
     await cursor.execute(
         f"""CREATE INDEX idx_user_org_user_id ON {user_organizations_table_name} (user_id)"""
     )
