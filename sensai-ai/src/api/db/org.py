@@ -91,39 +91,35 @@ async def get_org_id_from_api_key(api_key: str) -> int:
 
     raise ValueError("Invalid API key")
 
+async def create_organization_with_user(org_name: str, slug: str, user_id: str, user_email: str):
+   async with get_new_db_connection() as conn:
+       cursor = await conn.cursor()
+       
+       # Create or get user with email
+       user = await insert_or_return_user(cursor, user_email, user_id)
 
-async def create_organization_with_user(org_name: str, slug: str, user_id: str):
-    user = await get_user_by_id(user_id)
+       await cursor.execute(
+           f"SELECT id FROM {organizations_table_name} WHERE slug = ?",
+           (slug,),
+       )
+       existing_org = await cursor.fetchone()
 
-    if not user:
-        raise Exception(f"User with id '{user_id}' not found")
+       if existing_org:
+           raise Exception(f"Organization with slug '{slug}' already exists")
 
-    async with get_new_db_connection() as conn:
-        cursor = await conn.cursor()
+       await cursor.execute(
+           f"""INSERT INTO {organizations_table_name} 
+               (slug, name)
+               VALUES (?, ?)""",
+           (slug, org_name),
+       )
 
-        await cursor.execute(
-            f"SELECT id FROM {organizations_table_name} WHERE slug = ?",
-            (slug,),
-        )
-        existing_org = await cursor.fetchone()
+       org_id = cursor.lastrowid
+       await add_user_to_org_by_user_id(cursor, user_id, org_id, "owner")
+       await conn.commit()
 
-        if existing_org:
-            raise Exception(f"Organization with slug '{slug}' already exists")
-
-        await cursor.execute(
-            f"""INSERT INTO {organizations_table_name} 
-                (slug, name)
-                VALUES (?, ?)""",
-            (slug, org_name),
-        )
-
-        org_id = cursor.lastrowid
-        await add_user_to_org_by_user_id(cursor, user_id, org_id, "owner")
-        await conn.commit()
-
-    await send_slack_notification_for_new_org(org_name, org_id, user)
-
-    return org_id
+   await send_slack_notification_for_new_org(org_name, org_id, user)
+   return org_id
 
 
 def convert_org_db_to_dict(org: Tuple):

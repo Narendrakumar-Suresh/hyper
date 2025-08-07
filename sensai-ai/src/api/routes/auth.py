@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from typing import Dict
+from typing import Dict, Optional
 from api.db.user import insert_or_return_user
 from api.utils.db import get_new_db_connection
 from api.models import UserLoginData
@@ -40,10 +40,12 @@ async def login_or_signup_user(user_data: UserLoginData) -> Dict:
         user = await insert_or_return_user(
             cursor=cursor,
             email=user_data.email,
-            user_id=google_user_id,  # ← Correct: pass sub
+            user_id=google_user_id,
             given_name=user_data.given_name,
             family_name=user_data.family_name,
         )
         await conn.commit()
-
-    return user
+    
+    # --- CHANGE IS HERE ---
+    # Return the user's ID to the frontend.
+    return {"user_id": user["id"], "email": user["email"]}

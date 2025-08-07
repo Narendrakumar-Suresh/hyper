@@ -1,5 +1,5 @@
 # --- START OF FILE sensai-api/sensai_backend/routes/org_routes.py ---
-from fastapi import APIRouter, HTTPException, Body
+from fastapi import APIRouter, HTTPException, Body, Request
 import traceback
 from typing import List, Dict, Annotated
 from api.db.org import (
@@ -27,14 +27,14 @@ router = APIRouter()
 
 
 @router.post("/")
-async def create_organization(
-    request: CreateOrganizationRequest,
-) -> CreateOrganizationResponse:
+async def create_organization(request:Request):
+    body = await request.json()
     try:
         org_id = await create_organization_with_user(
-            request.name,
-            request.slug,
-            request.user_id,
+            body["name"],
+            body["slug"],
+            body["user_id"],
+            body["user_email"],
         )
 
         return {"id": org_id}

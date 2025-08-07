@@ -15,6 +15,7 @@ class CreateOrganizationRequest(BaseModel):
     name: str
     slug: str
     user_id: str
+    user_email: str
 
 
 class CreateOrganizationResponse(BaseModel):
