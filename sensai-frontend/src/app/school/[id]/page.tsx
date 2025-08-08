@@ -2,7 +2,6 @@
 
 import { useParams } from "next/navigation";
 import ClientSchoolLearnerView from "./ClientSchoolLearnerView";
-import { Button } from "@/components/ui/button";
 
 export default function SchoolPage() {
     const params = useParams();
