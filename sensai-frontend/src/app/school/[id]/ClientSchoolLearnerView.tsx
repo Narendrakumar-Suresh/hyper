@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import { Header } from "@/components/layout/header";
 import { Building, ChevronDown, ChevronLeft, Info } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -302,6 +303,7 @@ export default function ClientSchoolLearnerView({ slug }: { slug: string }) {
                 </div>
                 <div className="flex justify-center items-center py-12">
                     <div className="w-12 h-12 border-t-2 border-b-2 border-white rounded-full animate-spin"></div>
+                    <Button>Hello</Button>
                 </div>
             </div>
         );
